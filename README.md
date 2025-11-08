@@ -42,14 +42,23 @@ The [public/storage] directory has been linked.
 ※ダミーデータの商品画像は、storage/app/public/img 配下においてください。
 以下からダウンロードできます。
 スタイリッシュなデザインのメンズ腕時計	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Armani+Mens+Clock.jpg
+
 高速で信頼性の高いハードディスク	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/HDD+Hard+Disk.jpg
+
 新鮮な玉ねぎ3束のセット	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/iLoveIMG+d.jpg
+
 クラシックなデザインの革靴	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Leather+Shoes+Product+Photo.jpg
+
 高性能なノートパソコン	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Living+Room+Laptop.jpg
+
 高音質のレコーディング用マイク	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Music+Mic+4632231.jpg
+
 おしゃれなショルダーバッグ	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Purse+fashion+pocket.jpg
+
 使いやすいタンブラー	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Tumbler+souvenir.jpg
+
 手動のコーヒーミル	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Waitress+with+Coffee+Grinder.jpg
+
 便利なメイクアップセット	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/%E5%A4%96%E5%87%BA%E3%83%A1%E3%82%A4%E3%82%AF%E3%82%A2%E3%83%83%E3%83%95%E3%82%9A%E3%82%BB%E3%83%83%E3%83%88.jpg
 
 ## テーブル仕様
@@ -164,12 +173,16 @@ The [public/storage] directory has been linked.
 ![alt](ER.jpg)
 
 ## テストアカウント
-name: 一般ユーザ  
+name: 一般ユーザ 1
 email: general1@gmail.com  
 password: password  
 -------------------------
-name: 一般ユーザ  
+name: 一般ユーザ 2
 email: general2@gmail.com  
+password: password  
+-------------------------
+name: 一般ユーザ 3
+email: general3@gmail.com  
 password: password  
 -------------------------
 
