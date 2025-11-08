@@ -14,13 +14,15 @@ use Stripe\StripeClient;
 
 class PurchaseController extends Controller
 {
-    public function index($item_id, Request $request){
+    public function index($item_id, Request $request)
+    {
         $item = Item::find($item_id);
         $user = User::find(Auth::id());
-        return view('purchase',compact('item','user'));
+        return view('purchase', compact('item', 'user'));
     }
 
-    public function purchase($item_id, Request $request){
+    public function purchase($item_id, Request $request)
+    {
         $item = Item::find($item_id);
         $stripe = new StripeClient(config('stripe.stripe_secret_key'));
 
@@ -63,19 +65,20 @@ class PurchaseController extends Controller
         return redirect($checkout_session->url);
     }
 
-    public function success($item_id, Request $request){
+    public function success($item_id, Request $request)
+    {
         //無事決済が成功した後に動くメソッドのため、決済以外でHTTPリクエストが送られた時用にクエリパラメータを検閲
-        if(!$request->user_id || !$request->amount || !$request->sending_postcode || !$request->sending_address){
+        if (!$request->user_id || !$request->amount || !$request->sending_postcode || !$request->sending_address) {
             throw new Exception("You need all Query Parameters (user_id, amount, sending_postcode, sending_address)");
         }
 
         $stripe = new StripeClient(config('stripe.stripe_secret_key'));
 
-        $stripe->charges->create([
-            'amount' => $request->amount,
-            'currency' => 'jpy',
-            'source' => 'tok_visa',
-        ]);
+        // $stripe->charges->create([
+        //     'amount' => $request->amount,
+        //     'currency' => 'jpy',
+        //     'source' => 'tok_visa',
+        // ]);
 
         SoldItem::create([
             'user_id' => $request->user_id,
@@ -88,12 +91,14 @@ class PurchaseController extends Controller
         return redirect('/')->with('flashSuccess', '決済が完了しました！');
     }
 
-    public function address($item_id, Request $request){
+    public function address($item_id, Request $request)
+    {
         $user = User::find(Auth::id());
-        return view('address', compact('user','item_id'));
+        return view('address', compact('user', 'item_id'));
     }
 
-    public function updateAddress(AddressRequest $request){
+    public function updateAddress(AddressRequest $request)
+    {
 
         $user = User::find(Auth::id());
         Profile::where('user_id', $user->id)->update([

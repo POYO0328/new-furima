@@ -9,6 +9,8 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Requests\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\TradeController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 /*
@@ -60,3 +62,15 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     session()->forget('unauthenticated_user');
     return redirect('/mypage/profile');
 })->name('verification.verify');
+
+Route::get('/chat/{sold_item}', [ChatController::class, 'show'])->name('chat.show');
+Route::post('/chat/{sold_item}', [ChatController::class, 'store'])->name('chat.store');
+
+Route::post('/trade/{sold_item}/complete', [TradeController::class, 'complete'])
+    ->name('trade.complete');
+
+// チャット削除
+Route::delete('/chat/{chat}', [ChatController::class, 'destroy'])->name('chat.destroy');
+
+// チャット編集（更新）
+Route::put('/chat/{chat}', [ChatController::class, 'update'])->name('chat.update');

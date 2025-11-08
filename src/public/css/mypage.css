@@ -29,3 +29,77 @@
 .items{
     margin-top: 30px;
 }
+
+.item__img--container {
+    position: relative;
+    /* バッジを画像の上に配置できるようにする */
+}
+
+.badge {
+    position: absolute;
+    top: 6px;
+    /* 画像左上からの距離 */
+    left: 6px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.total-unread {
+    background-color: red;
+    color: white;
+    border-radius: 40%;
+    padding: 1px 7px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 6px;
+    vertical-align: middle;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.has-unread {
+    color: #d63333;
+    /* 赤っぽい文字色 */
+    font-weight: bold;
+}
+
+/* ユーザー名と評価の配置 */
+.user__info {
+    display: flex;
+    /* ←縦並びに変更 */
+    align-items: center;
+    /* ←中央寄せ */
+    text-align: center;
+}
+
+/* 星の基本スタイル */
+.user__rating {
+    margin-top: 5px;
+    font-size: 20px;
+    letter-spacing: 3px;
+}
+
+/* 星マークの色 */
+.star {
+    color: #ccc;
+    /* グレー（空） */
+}
+
+.star.filled {
+    color: #FFD700;
+    /* 黄色（金色） */
+}
+
+/* 数値部分 */
+.rating-num {
+    font-size: 14px;
+    color: #555;
+    margin-left: 4px;
+}
