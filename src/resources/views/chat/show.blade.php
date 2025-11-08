@@ -272,7 +272,8 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: formData
-                }).then(res => res.ok ? location.reload() : alert('更新に失敗しました'));
+                })
+                .then(res => res.ok ? location.reload() : alert('更新に失敗しました'));
             }
         });
 

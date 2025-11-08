@@ -113,15 +113,19 @@ class ChatController extends Controller
 
         $validated = $request->validated();
 
-        // 画像更新（任意）
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('chat_images', 'public');
-            $validated['image_path'] = $path;
+         if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('chat_images', 'public');
         }
 
         $chat->update([
-            'message' => $request->message,
+            'message' => $validated['message'],
+            'image' => $validated['image'] ?? $chat->image,
         ]);
+
+        // fetchの場合はJSON返す
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->back()->with('success', 'メッセージを更新しました');
     }

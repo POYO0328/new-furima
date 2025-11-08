@@ -30,6 +30,28 @@ STRIPE_SECRET_KEY="シークレットキー"
 
 以下のリンクは公式ドキュメントです。<br>
 https://docs.stripe.com/payments/checkout?locale=ja-JP
+
+## ダミーデータ画像表示について
+コンテナ内で以下を実行
+php artisan storage:link
+
+実行後に出るメッセージ：
+The [public/storage] directory has been linked.
+これが出たら成功です。
+
+※ダミーデータの商品画像は、storage/app/public/img 配下においてください。
+以下からダウンロードできます。
+スタイリッシュなデザインのメンズ腕時計	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Armani+Mens+Clock.jpg
+高速で信頼性の高いハードディスク	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/HDD+Hard+Disk.jpg
+新鮮な玉ねぎ3束のセット	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/iLoveIMG+d.jpg
+クラシックなデザインの革靴	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Leather+Shoes+Product+Photo.jpg
+高性能なノートパソコン	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Living+Room+Laptop.jpg
+高音質のレコーディング用マイク	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Music+Mic+4632231.jpg
+おしゃれなショルダーバッグ	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Purse+fashion+pocket.jpg
+使いやすいタンブラー	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Tumbler+souvenir.jpg
+手動のコーヒーミル	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Waitress+with+Coffee+Grinder.jpg
+便利なメイクアップセット	https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/%E5%A4%96%E5%87%BA%E3%83%A1%E3%82%A4%E3%82%AF%E3%82%A2%E3%83%83%E3%83%95%E3%82%9A%E3%82%BB%E3%83%83%E3%83%88.jpg
+
 ## テーブル仕様
 ### usersテーブル
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
@@ -90,11 +112,15 @@ https://docs.stripe.com/payments/checkout?locale=ja-JP
 ### sold_itemsテーブル
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 | --- | --- | --- | --- | --- | --- |
+| id | bigint | ◯ |  | ◯ |  |
 | user_id | bigint |  |  | ◯ | users(id) |
 | item_id | bigint |  |  | ◯ | items(id) |
 | sending_postcode | varchar(255) |  |  | ◯ |  |
 | sending_address | varchar(255) |  |  | ◯ |  |
 | sending_building | varchar(255) |  |  |  |  |
+| buyer_rating | tinyint |  |  |  |  |
+| seller_rating | tinyint |  |  |  |  |
+| status | enum |  |  | ◯ |  |
 | created_at | created_at |  |  |  |  |
 | updated_at | updated_at |  |  |  |  |
 
@@ -122,8 +148,20 @@ https://docs.stripe.com/payments/checkout?locale=ja-JP
 | created_at | timestamp |  |  |  |  |
 | updated_at | timestamp |  |  |  |  |
 
+### chatsテーブル
+| カラム名 | 型 | primary key | unique key | not null | foreign key |
+| --- | --- | --- | --- | --- | --- |
+| id | bigint | ◯ |  | ◯ |  |
+| sold_item_id | bigint |  |  | ◯ | sold_items(id) |
+| user_id  | bigint |  |  | ◯ | users(id) |
+| message | text |  |  |  |  |
+| image | varchar(255) |  |  |  |  |
+| is_read | tinyint(1) |  |  | ◯ |  |
+| created_at | timestamp |  |  |  |  |
+| updated_at | timestamp |  |  |  |  |
+
 ## ER図
-![alt](ER.png)
+![alt](ER.jpg)
 
 ## テストアカウント
 name: 一般ユーザ  
@@ -149,7 +187,3 @@ php artisan migrate:fresh --env=testing
 ./vendor/bin/phpunit
 ```
 ※.env.testingにもStripeのAPIキーを設定してください。  
-
-## 生徒様へ
-普段よりお世話になっております。  
-こちらの模範解答に関するご質問、またこちらに不備を見つけた、などの際は気兼ねなく申し付けください。
