@@ -72,15 +72,22 @@ class ChatController extends Controller
         // 画像保存（任意）
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('chat_images', 'public');
-            $validated['image_path'] = $path;
+            $validated['image'] = $path;
         }
 
-        Chat::create([
+        $chatData = [
             'sold_item_id' => $sold_item_id,
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $validated['message'] ?? '',
+            'image' => null,
             'is_read' => false,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $chatData['image'] = $request->file('image')->store('chat_images', 'public');
+        }
+
+        Chat::create($chatData);
 
         return redirect()->route('chat.show', ['sold_item' => $sold_item_id]);
     }

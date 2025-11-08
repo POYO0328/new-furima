@@ -26,16 +26,16 @@ class TradeController extends Controller
 
         // ★ 購入者が評価した場合
         if ($isBuyer) {
-            $sold_item->buyer_rating = $rating;
-            $sold_item->status = 'buyer_rated'; // 購入者評価済み
+            $sold_item->seller_rating = $rating;
+            $sold_item->status = 'buyer_rated';
         }
         // ★ 出品者が評価した場合
         elseif ($isSeller) {
             if ($sold_item->status !== 'buyer_rated') {
                 return redirect()->back()->with('error', '購入者が評価を完了してから評価できます。');
             }
-            $sold_item->seller_rating = $rating;
-            $sold_item->status = 'completed'; // 出品者の評価で完了！
+            $sold_item->buyer_rating = $rating;
+            $sold_item->status = 'completed';
         } else {
             return redirect()->back()->with('error', 'この取引に対する評価権限がありません。');
         }

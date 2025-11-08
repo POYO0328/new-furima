@@ -10,9 +10,10 @@ return new class extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sold_item_id')->constrained()->cascadeOnDelete(); // 取引単位で紐づけ
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // メッセージ送信者
-            $table->text('message');
+            $table->foreignId('sold_item_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->text('message')->nullable();
+            $table->string('image')->nullable();
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });

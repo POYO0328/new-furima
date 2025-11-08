@@ -86,7 +86,13 @@
 
                 {{-- メッセージ本文 --}}
                 <div class="message-bubble">
-                    <p>{{ $chat->message }}</p>
+                    @if (!empty($chat->message))
+                        <p>{{ $chat->message }}</p>
+                    @endif
+
+                    @if (!empty($chat->image))
+                        <img src="{{ Storage::url($chat->image) }}" alt="送信画像" class="chat-image-preview">
+                    @endif
                 </div>
 
                 {{-- 自分のメッセージ操作 --}}
@@ -118,8 +124,13 @@
                     </div>
                 @endif
 
+                <!-- 選択ファイル名表示用 -->
+                <p id="selectedFileName" class="file-name-display" style="margin-bottom:5px;"></p>
+
                 <input type="hidden" name="chat_id" id="chat_id" value="">
                 <input type="text" name="message" id="chatMessageInput" placeholder="取引メッセージを記入してください">
+
+                
             </div>
 
             <label class="image-upload">
@@ -175,8 +186,20 @@
         const closeModalBtn = modal.querySelector('.close');
         const stars = modal.querySelectorAll('.star');
         const ratingInput = document.getElementById('rating');
+        const imageInput = document.querySelector('input[name="image"]');
+        const selectedFileName = document.getElementById('selectedFileName');
 
         if (!messageInput) return;
+
+        if (imageInput) {
+            imageInput.addEventListener('change', () => {
+                if (imageInput.files.length > 0) {
+                    selectedFileName.textContent = "選択中のファイル: " + imageInput.files[0].name;
+                } else {
+                    selectedFileName.textContent = "";
+                }
+            });
+        }
 
         // --- 入力内容の保持 ---
         const storageKey = 'chatMessageDraft_' + '{{ $soldItem->id }}';

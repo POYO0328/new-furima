@@ -13,6 +13,8 @@ class Chat extends Model
         'sold_item_id',
         'user_id',
         'message',
+        'image', // ← これがないと登録されません
+        'is_read',
     ];
 
     /**
