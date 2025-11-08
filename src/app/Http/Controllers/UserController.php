@@ -98,25 +98,39 @@ class UserController extends Controller
         } elseif ($page === 'trading') {
             // 取引中 or 評価中（購入者が評価済）の商品
             $items = SoldItem::where(function ($q) use ($user) {
-                $q->where('user_id', $user->id) // 購入者
+                    $q->where('user_id', $user->id) // 購入者
                     ->orWhereHas('item', function ($query) use ($user) {
                         $query->where('user_id', $user->id); // 出品者
                     });
-            })
-                ->whereIn('status', ['trading', 'buyer_rated'])                ->with(['item', 'buyer', 'item.user'])
+                })
+                ->whereIn('status', ['trading', 'buyer_rated'])
+                ->with(['item', 'buyer', 'item.user'])
+                ->orderBy('updated_at', 'desc')
                 ->get()
                 ->map(function ($sold_item) use ($user) {
                     $item = $sold_item->item;
                     $item->sold_item_id = $sold_item->id;
 
-                    // 未読メッセージ数も同様に取得
+                    // 未読メッセージ数
                     $item->unread_count = \App\Models\Chat::where('sold_item_id', $sold_item->id)
                         ->where('user_id', '!=', $user->id)
                         ->where('is_read', false)
                         ->count();
 
+                    // 最新メッセージ日時
+                    $lastChat = \App\Models\Chat::where('sold_item_id', $sold_item->id)
+                        ->latest('created_at')
+                        ->first();
+                    $item->last_chat_at = $lastChat->created_at ?? $sold_item->updated_at;
+
                     return $item;
-                });
+                })
+                ->sortByDesc(function($item) {
+                    // 未読 > 既読、同じグループ内は最新メッセージ順
+                    return [$item->unread_count > 0 ? 1 : 0, $item->last_chat_at->timestamp];
+                })
+                ->values(); // インデックスを振り直す
+
         } elseif ($page === 'sell' || empty($page)) {
             // 出品した商品一覧 ← 元の挙動を明示的に復活！
             $items = Item::where('user_id', $user->id)->get();

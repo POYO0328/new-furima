@@ -94,42 +94,5 @@
         @endforeach
         @endif
     </div>
-
-    <!-- <div class="items">
-        @if($page === 'trading')
-            @foreach ($items as $item)
-                <div class="item">
-                    <a href="{{ route('chat.show', ['sold_item' => $item->id]) }}">
-                        <div class="item__img--container">
-                            <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
-                        </div>
-                        <p class="item__name">{{$item->name}}</p>
-
-                        {{-- 👇 メッセージ未読数（あとで実装） --}}
-                        @if(isset($item->unread_count) && $item->unread_count > 0)
-                            <span class="badge">新着{{$item->unread_count}}件</span>
-                        @endif
-                    </a>
-                </div>
-            @endforeach
-        @else
-            @foreach ($items as $item)
-                <div class="item">
-                    <a href="/item/{{$item->id}}">
-                        @if ($item->sold())
-                            <div class="item__img--container sold">
-                                <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
-                            </div>
-                        @else
-                            <div class="item__img--container">
-                                <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">
-                            </div>
-                        @endif
-                        <p class="item__name">{{$item->name}}</p>
-                    </a>
-                </div>
-            @endforeach
-        @endif
-    </div> -->
 </div>
 @endsection

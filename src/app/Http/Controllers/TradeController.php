@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\SoldItem;
+use App\Mail\SellerRatedNotification;
 
 class TradeController extends Controller
 {
@@ -39,6 +41,13 @@ class TradeController extends Controller
         }
 
         $sold_item->save();
+
+         if ($isBuyer) {
+            // ✅ 出品者に通知メール送信
+            $seller = $sold_item->item->user;
+            Mail::to($seller->email)->send(new SellerRatedNotification($sold_item, $user));
+        }
+
 
         // 完了したら商品一覧へ
         return redirect('http://localhost')->with('success', '評価を登録しました！');

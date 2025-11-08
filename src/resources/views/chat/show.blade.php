@@ -16,7 +16,7 @@
         <h2>そ の 他 の 取 引</h2>
         <ul class="trade-list">
             @foreach($activeTrades as $trade)
-            <li class="trade-item {{ $trade->id == $soldItem->id ? 'active' : '' }}">
+            <li class="trade-item {{ $trade->id == $soldItem->id ? 'active' : 'noActive' }}">
                 <a href="{{ route('chat.show', $trade->id) }}">
                     {{ $trade->item->name }}
                 </a>
@@ -31,10 +31,11 @@
         {{-- ヘッダー --}}
         <div class="chat-header">
             <div class="user-info">
-                <img src="{{ isset($chatPartner->profile->img_url)
-                    ? Storage::url($chatPartner->profile->img_url)
-                    : asset('images/sample-user.png') }}"
-                    alt="ユーザーアイコン" class="user-icon">
+                @if (!empty($chatPartner->profile->img_url))
+                    <img src="{{ Storage::url($chatPartner->profile->img_url) }}" alt="ユーザーアイコン" class="user-icon">
+                @else
+                    <img src="{{ Storage::url('img/icon.png') }}" alt="デフォルトアイコン" class="user-icon">
+                @endif
                 <h2>「{{ $chatPartner->name ?? 'ユーザー名' }}」さんとの取引画面</h2>
             </div>
             @if ($canRate)
@@ -65,19 +66,21 @@
                 {{-- ユーザー情報 --}}
                 @if($chat->user_id != Auth::id())
                 <div class="message-user">
-                    <img src="{{ isset($chatPartner->profile->img_url)
-                                ? Storage::url($chatPartner->profile->img_url)
-                                : asset('images/sample-user.png') }}"
-                        alt="ユーザーアイコン" class="user-icon">
+                    @if (!empty($chatPartner->profile->img_url))
+                        <img src="{{ Storage::url($chatPartner->profile->img_url) }}" alt="ユーザーアイコン" class="user-icon">
+                    @else
+                        <img src="{{ Storage::url('img/icon.png') }}" alt="デフォルトアイコン" class="user-icon">
+                    @endif
                     <span class="chat-username">{{ $chat->user->name }}</span>
                 </div>
                 @else
                 <div class="message-user mine-user">
                     <span class="chat-username">{{ Auth::user()->name }}</span>
-                    <img src="{{ isset(Auth::user()->profile->img_url)
-                                ? Storage::url(Auth::user()->profile->img_url)
-                                : asset('images/sample-user.png') }}"
-                        alt="自分のアイコン" class="user-icon">
+                     @if (!empty(Auth::user()->profile->img_url))
+                        <img src="{{ Storage::url(Auth::user()->profile->img_url) }}" alt="自分のアイコン" class="user-icon">
+                    @else
+                        <img src="{{ Storage::url('img/icon.png') }}" alt="デフォルトアイコン" class="user-icon">
+                    @endif
                 </div>
                 @endif
 
@@ -102,20 +105,34 @@
             @endforeach
         </div>
 
-        {{-- 入力フォーム --}}
         <form id="chatForm" action="{{ route('chat.store', ['sold_item' => $soldItem->id]) }}" method="POST" class="chat-form" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="chat_id" id="chat_id" value="">
-            <input type="text" name="message" id="chatMessageInput" placeholder="取引メッセージを記入してください" required>
+
+            {{-- 入力欄＋エラー用ラッパー --}}
+            <div class="input-wrapper">
+                @if ($errors->any())
+                    <div class="error-messages">
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                <input type="hidden" name="chat_id" id="chat_id" value="">
+                <input type="text" name="message" id="chatMessageInput" placeholder="取引メッセージを記入してください">
+            </div>
+
             <label class="image-upload">
                 画像を追加
                 <input type="file" name="image" accept="image/*" hidden>
             </label>
-            <button type="submit" class="send-btn">
+
+            <button type="submit" class="message-send-btn">
+                <span id="sendBtnLabel"></span>
                 <img src="{{ Storage::url('img/send_icon.png') }}" alt="送信" class="send-icon">
             </button>
-
         </form>
+
 
         {{-- 取引完了モーダル --}}
         <div id="completeModal" class="modal" style="display:none;">
@@ -199,7 +216,7 @@
 
                 chatIdInput.value = chatId;
                 messageInput.value = messageText;
-                sendBtnLabel.textContent = '編集';
+                sendBtnLabel.textContent = '';
                 messageInput.focus();
                 cancelBtn.style.display = 'inline-block';
 
@@ -213,7 +230,7 @@
                 this.style.display = 'none';
                 chatIdInput.value = '';
                 messageInput.value = '';
-                sendBtnLabel.textContent = '📩';
+                sendBtnLabel.textContent = ' ';
                 editMode = false;
                 editingChatId = null;
             });

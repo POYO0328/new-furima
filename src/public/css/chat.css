@@ -166,7 +166,6 @@ body {
 /* 入力フォーム */
 .chat-form {
     display: flex;
-    align-items: center;
     border-top: 1px solid #ddd;
     padding: 15px;
     background: #fff;
@@ -183,7 +182,7 @@ body {
 .image-upload {
     border: 1px solid #ff8b8b;
     color: #ff8b8b;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
@@ -295,10 +294,6 @@ body {
     cursor: pointer;
 }
 
-.send-btn:hover {
-    background-color: #ff6b6b;
-}
-
 /* 共通：メッセージブロック */
 .chat-message {
     display: flex;
@@ -394,7 +389,7 @@ html {
 .chat-form {
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     padding: 15px;
     background: #fff;
     border-top: 1px solid #ddd;
@@ -446,12 +441,18 @@ html {
 
 /* 現在選択中のアイテム */
 .trade-item.active {
-    background-color: #e0e0e0;
+    background-color: #cacacaff;
     font-weight: bold;
     text-align: center;
 }
 
-.send-btn {
+/* 未選択のアイテム */
+.trade-item.noActive {
+    font-weight: bold;
+    text-align: center;
+}
+
+.message-send-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -462,15 +463,30 @@ html {
 }
 
 .send-icon {
-    width: 26px;
     height: 26px;
-    filter: invert(60%) sepia(50%) saturate(500%) hue-rotate(180deg);
-    /* グレー系 */
     transition: filter 0.2s ease, transform 0.2s ease;
 }
 
-.send-btn:hover .send-icon {
-    filter: invert(50%) sepia(100%) saturate(400%) hue-rotate(200deg);
-    /* 青っぽく光る */
+.message-send-btn:hover .send-icon {
     transform: translateY(-2px);
 }
+
+/* エラー表示のスタイル */
+/* 入力欄＋エラーラッパーを縦並びに */
+.input-wrapper {
+    display: flex;
+    flex-direction: column; /* 縦並び */
+    flex: 1; /* 横幅いっぱいに広げる */
+}
+
+/* エラー表示 */
+.error-messages {
+    margin-bottom: 5px;
+}
+
+.error-messages p {
+    color: red;
+    font-size: 14px;
+    margin: 2px 0;
+}
+

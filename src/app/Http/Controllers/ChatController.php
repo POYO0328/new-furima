@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Chat;
 use App\Models\SoldItem;
+use App\Http\Requests\ChatRequest;
 
 class ChatController extends Controller
 {
@@ -62,9 +63,17 @@ class ChatController extends Controller
         return view('chat.show', compact('soldItem', 'chats', 'chatPartner', 'authUser', 'activeTrades', 'isBuyer', 'isSeller', 'canRate'));
     }
 
-    public function store(Request $request, $sold_item_id)
+    public function store(ChatRequest $request, $sold_item_id)
     {
         $soldItem = SoldItem::findOrFail($sold_item_id);
+
+        $validated = $request->validated();
+
+        // 画像保存（任意）
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('chat_images', 'public');
+            $validated['image_path'] = $path;
+        }
 
         Chat::create([
             'sold_item_id' => $sold_item_id,
@@ -89,15 +98,19 @@ class ChatController extends Controller
     }
 
 
-    public function update(Request $request, Chat $chat)
+    public function update(ChatRequest $request, Chat $chat)
     {
         if ($chat->user_id !== auth()->id()) {
             abort(403, '不正な操作です');
         }
 
-        $request->validate([
-            'message' => 'required|string|max:1000',
-        ]);
+        $validated = $request->validated();
+
+        // 画像更新（任意）
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('chat_images', 'public');
+            $validated['image_path'] = $path;
+        }
 
         $chat->update([
             'message' => $request->message,
