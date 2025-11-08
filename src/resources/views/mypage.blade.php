@@ -63,7 +63,6 @@
         @if($page === 'trading')
         @foreach ($items as $item)
         <div class="item">
-            {{-- 👇 sold_item_idを利用してチャット画面へ --}}
             <a href="{{ route('chat.show', ['sold_item' => $item->sold_item_id]) }}">
                 <div class="item__img--container">
                     <img src="{{ \Storage::url($item->img_url) }}" class="item__img" alt="商品画像">

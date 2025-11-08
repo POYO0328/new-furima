@@ -24,12 +24,12 @@ class TradeController extends Controller
         $isBuyer = $sold_item->user_id === $user->id ?? false;
         $isSeller = $sold_item->item->user_id === $user->id;
 
-        // ★ 購入者が評価した場合
+        // 購入者が評価した場合
         if ($isBuyer) {
             $sold_item->seller_rating = $rating;
             $sold_item->status = 'buyer_rated';
         }
-        // ★ 出品者が評価した場合
+        // 出品者が評価した場合
         elseif ($isSeller) {
             if ($sold_item->status !== 'buyer_rated') {
                 return redirect()->back()->with('error', '購入者が評価を完了してから評価できます。');
@@ -43,7 +43,6 @@ class TradeController extends Controller
         $sold_item->save();
 
          if ($isBuyer) {
-            // ✅ 出品者に通知メール送信
             $seller = $sold_item->item->user;
             Mail::to($seller->email)->send(new SellerRatedNotification($sold_item, $user));
         }

@@ -60,7 +60,7 @@ class UserController extends Controller
     public function mypage(Request $request)
     {
         $user = User::find(Auth::id());
-        $page = $request->page ?? 'sell'; // ← デフォルトを 'sell' にしておくと安全
+        $page = $request->page ?? 'sell';
 
         // 未読メッセージ総数の算出
         $totalUnreadCount = \App\Models\Chat::whereHas('soldItem', function ($query) use ($user) {
@@ -75,7 +75,7 @@ class UserController extends Controller
             ->where('user_id', '!=', $user->id)
             ->count();
 
-        // ✅ 評価計算（購入者＋出品者両方）
+        // 評価計算（購入者＋出品者両方）
         $buyerRatings = \App\Models\SoldItem::where('user_id', $user->id)
         ->whereNotNull('buyer_rating')
         ->pluck('buyer_rating');
@@ -129,13 +129,13 @@ class UserController extends Controller
                     // 未読 > 既読、同じグループ内は最新メッセージ順
                     return [$item->unread_count > 0 ? 1 : 0, $item->last_chat_at->timestamp];
                 })
-                ->values(); // インデックスを振り直す
+                ->values();
 
         } elseif ($page === 'sell' || empty($page)) {
-            // 出品した商品一覧 ← 元の挙動を明示的に復活！
+            // 出品した商品一覧 
             $items = Item::where('user_id', $user->id)->get();
         } else {
-            $items = collect(); // 万一どれにも該当しない場合は空コレクション
+            $items = collect();
         }
 
         return view('mypage', compact('user', 'items', 'page', 'totalUnreadCount', 'avgRating'));

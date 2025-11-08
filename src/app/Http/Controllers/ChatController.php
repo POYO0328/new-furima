@@ -69,7 +69,7 @@ class ChatController extends Controller
 
         $validated = $request->validated();
 
-        // 画像保存（任意）
+        // 画像保存
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('chat_images', 'public');
             $validated['image'] = $path;

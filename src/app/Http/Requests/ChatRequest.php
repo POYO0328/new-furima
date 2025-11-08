@@ -8,7 +8,6 @@ class ChatRequest extends FormRequest
 {
     public function authorize()
     {
-        // 誰でも送信できる場合は true
         return true;
     }
 

@@ -13,16 +13,12 @@ class Chat extends Model
         'sold_item_id',
         'user_id',
         'message',
-        'image', // ← これがないと登録されません
+        'image',
         'is_read',
     ];
 
-    /**
-     * このチャットが属する取引（sold_item）を取得
-     */
     public function soldItem()
     {
-        // 第二引数で外部キーを明示的に指定する！
         return $this->belongsTo(\App\Models\SoldItem::class, 'sold_item_id', 'id');
     }
 
