@@ -140,7 +140,7 @@
 
             <button type="submit" class="message-send-btn">
                 <span id="sendBtnLabel"></span>
-                <img src="{{ Storage::url('img/send_icon.png') }}" alt="送信" class="send-icon">
+                <img src="{{ asset('img/send_icon.png') }}" alt="送信" class="send-icon">
             </button>
         </form>
 
