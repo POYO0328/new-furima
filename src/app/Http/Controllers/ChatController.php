@@ -53,14 +53,15 @@ class ChatController extends Controller
 
         $status = $soldItem->status;
         $canRate = false;
+        $canSellerRate = false;
 
         if ($status === 'trading' && $isBuyer) {
             $canRate = true; // 購入者のみ
         } elseif ($status === 'buyer_rated' && $isSeller) {
-            $canRate = true; // 出品者のみ
+            $canSellerRate = true; // 出品者のみ
         }
 
-        return view('chat.show', compact('soldItem', 'chats', 'chatPartner', 'authUser', 'activeTrades', 'isBuyer', 'isSeller', 'canRate'));
+        return view('chat.show', compact('soldItem', 'chats', 'chatPartner', 'authUser', 'activeTrades', 'isBuyer', 'isSeller', 'canRate', 'canSellerRate'));
     }
 
     public function store(ChatRequest $request, $sold_item_id)

@@ -146,7 +146,8 @@
 
 
         {{-- 取引完了モーダル --}}
-        <div id="completeModal" class="modal" style="display:none;">
+        @if ($canRate || $canSellerRate)
+        <div id="completeModal" class="modal" style="{{ $canSellerRate ? '' : 'display:none;' }}">
             <div class="modal-content">
                 <span class="close"></span>
                 <p class="comp">取引が完了しました。</p>
@@ -170,135 +171,126 @@
                 </form>
             </div>
         </div>
-
+        @endif
     </div>
 </div>
 
 {{-- JS --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('chatForm');
-        const chatIdInput = document.getElementById('chat_id');
-        const messageInput = document.getElementById('chatMessageInput');
-        const sendBtnLabel = document.getElementById('sendBtnLabel');
-        const modal = document.getElementById('completeModal');
-        const openModalBtn = document.getElementById('openModalBtn');
-        const closeModalBtn = modal.querySelector('.close');
-        const stars = modal.querySelectorAll('.star');
-        const ratingInput = document.getElementById('rating');
-        const imageInput = document.querySelector('input[name="image"]');
-        const selectedFileName = document.getElementById('selectedFileName');
+    const form = document.getElementById('chatForm');
+    const chatIdInput = document.getElementById('chat_id');
+    const messageInput = document.getElementById('chatMessageInput');
+    const sendBtnLabel = document.getElementById('sendBtnLabel');
 
-        if (!messageInput) return;
+    const modal = document.getElementById('completeModal');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = modal ? modal.querySelector('.close') : null;
+    const stars = modal ? modal.querySelectorAll('.star') : [];
+    const ratingInput = document.getElementById('rating');
 
-        if (imageInput) {
-            imageInput.addEventListener('change', () => {
-                if (imageInput.files.length > 0) {
-                    selectedFileName.textContent = "選択中のファイル: " + imageInput.files[0].name;
-                } else {
-                    selectedFileName.textContent = "";
-                }
-            });
-        }
+    const imageInput = document.querySelector('input[name="image"]');
+    const selectedFileName = document.getElementById('selectedFileName');
 
-        // --- 入力内容の保持 ---
-        const storageKey = 'chatMessageDraft_' + '{{ $soldItem->id }}';
+    if (!messageInput) return;
 
-        // ページ読み込み時に復元
-        setTimeout(() => {
-            const savedMessage = localStorage.getItem(storageKey);
-            if (savedMessage) {
-                messageInput.value = savedMessage;
-            }
-        }, 0);
-
-        messageInput.addEventListener('input', function() {
-            localStorage.setItem(storageKey, messageInput.value);
+    // --- 画像選択 ---
+    if (imageInput) {
+        imageInput.addEventListener('change', () => {
+            selectedFileName.textContent = imageInput.files.length > 0
+                ? "選択中のファイル: " + imageInput.files[0].name
+                : "";
         });
+    }
 
-        // 送信時に削除
-        form.addEventListener('submit', function() {
-            localStorage.removeItem(storageKey);
+    // --- 入力内容保持 ---
+    const storageKey = 'chatMessageDraft_' + '{{ $soldItem->id }}';
+    const savedMessage = localStorage.getItem(storageKey);
+    if (savedMessage) messageInput.value = savedMessage;
+
+    messageInput.addEventListener('input', () => localStorage.setItem(storageKey, messageInput.value));
+    form.addEventListener('submit', () => localStorage.removeItem(storageKey));
+
+    // --- 編集機能 ---
+    let editMode = false;
+    let editingChatId = null;
+
+    const hideAllCancelButtons = () => {
+        document.querySelectorAll('.inline-cancel-btn').forEach(btn => btn.style.display = 'none');
+    };
+
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            hideAllCancelButtons();
+            const chatMessage = this.closest('.chat-message');
+            const chatId = chatMessage.dataset.id;
+            const messageText = chatMessage.querySelector('.message-bubble p').innerText;
+            const cancelBtn = chatMessage.querySelector('.inline-cancel-btn');
+
+            chatIdInput.value = chatId;
+            messageInput.value = messageText;
+            sendBtnLabel.textContent = '';
+            messageInput.focus();
+            cancelBtn.style.display = 'inline-block';
+
+            editMode = true;
+            editingChatId = chatId;
         });
+    });
 
-        // --- 編集機能 ---
-        let editMode = false;
-        let editingChatId = null;
-
-        const hideAllCancelButtons = () => {
-            document.querySelectorAll('.inline-cancel-btn').forEach(btn => btn.style.display = 'none');
-        };
-
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                hideAllCancelButtons();
-                const chatMessage = this.closest('.chat-message');
-                const chatId = chatMessage.dataset.id;
-                const messageText = chatMessage.querySelector('.message-bubble p').innerText;
-                const cancelBtn = chatMessage.querySelector('.inline-cancel-btn');
-
-                chatIdInput.value = chatId;
-                messageInput.value = messageText;
-                sendBtnLabel.textContent = '';
-                messageInput.focus();
-                cancelBtn.style.display = 'inline-block';
-
-                editMode = true;
-                editingChatId = chatId;
-            });
+    document.querySelectorAll('.inline-cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.style.display = 'none';
+            chatIdInput.value = '';
+            messageInput.value = '';
+            sendBtnLabel.textContent = ' ';
+            editMode = false;
+            editingChatId = null;
         });
+    });
 
-        document.querySelectorAll('.inline-cancel-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.style.display = 'none';
-                chatIdInput.value = '';
-                messageInput.value = '';
-                sendBtnLabel.textContent = ' ';
-                editMode = false;
-                editingChatId = null;
-            });
-        });
+    form.addEventListener('submit', function(e) {
+        if (editMode && editingChatId) {
+            e.preventDefault();
+            const url = `/chat/${editingChatId}`;
+            const formData = new FormData(form);
+            formData.append('_method', 'PUT');
 
-        form.addEventListener('submit', function(e) {
-            if (editMode && editingChatId) {
-                e.preventDefault();
-                const url = `/chat/${editingChatId}`;
-                const formData = new FormData(form);
-                formData.append('_method', 'PUT');
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: formData
-                })
-                .then(res => res.ok ? location.reload() : alert('更新に失敗しました'));
-            }
-        });
-
-        // --- モーダル機能 ---
-        openModalBtn.addEventListener('click', () => modal.style.display = 'block');
-        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-        window.addEventListener('click', e => {
-            if (e.target === modal) modal.style.display = 'none';
-        });
-
-        // --- 星クリックで評価 ---
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                const val = parseInt(star.dataset.value);
-                ratingInput.value = val;
-                highlightStars(val);
-            });
-        });
-
-        function highlightStars(rating) {
-            stars.forEach((star, idx) => {
-                if (idx < rating) star.classList.add('selected');
-                else star.classList.remove('selected');
-            });
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData
+            })
+            .then(res => res.ok ? location.reload() : alert('更新に失敗しました'));
         }
     });
+
+    // --- モーダル表示 ---
+    @if ($canSellerRate)
+        if (modal) modal.style.display = 'block'; // 販売者モード初期表示
+    @endif
+
+    if (openModalBtn && modal) {
+        openModalBtn.addEventListener('click', () => modal.style.display = 'block'); // 購入者用ボタン
+    }
+
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+    }
+
+    window.addEventListener('click', e => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+
+    // --- 星評価 ---
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const val = parseInt(star.dataset.value);
+            ratingInput.value = val;
+            stars.forEach((s, idx) => idx < val ? s.classList.add('selected') : s.classList.remove('selected'));
+        });
+    });
+});
+
 </script>
 @endsection
