@@ -23,8 +23,8 @@ class ChatRequest extends FormRequest
     {
         return [
             'message.required' => '本文を入力してください',
-            'message.max' => '本文は400文字以内で入力してください。',
-            'image.mimes' => '画像は jpeg または png のみアップロード可能です。',
+            'message.max' => '本文は400文字以内で入力してください',
+            'image.mimes' => '「.png」または 「.jpeg」   形式でアップロードしてください',
         ];
     }
 }
